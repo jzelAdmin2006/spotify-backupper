@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Authentication Success</title>
+  <style>
+    body {
+      text-align: center;
+      font-size: 24px;
+      margin-top: 5%;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+
+    .cat {
+      width: 40%;
+    }
+  </style>
+</head>
+<body>
+<p>Authentication successful!</p>
+<img alt="Happy Cat" class="cat" id="randomCatImage" src="/img/Cat1.png">
+
+<canvas id="confettiCanvas"></canvas>
+
+<script>
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const confettis = [];
+
+  function randomColor() {
+    const colors = ['#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#6a4c93'];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  class Confetti {
+    constructor(x, y) {
+      this.x = x;
+      this.y = y;
+      this.size = (Math.random() * 0.5 + 0.75) * 15;
+      this.gravity = (Math.random() * 0.5 + 1.5) * 0.5;
+      this.wind = (Math.random() - 0.5) * 4;
+      this.color = randomColor();
+      this.rotation = Math.random() * 360;
+    }
+
+    update() {
+      this.y += this.gravity;
+      this.x += this.wind;
+      this.rotation += this.wind * 0.5;
+    }
+
+    draw() {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.rotation * Math.PI / 180);
+      ctx.fillStyle = this.color;
+      ctx.fillRect(0, 0, this.size, this.size);
+      ctx.restore();
+    }
+  }
+
+  function updateConfettis() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    confettis.forEach((confetti, index) => {
+      confetti.update();
+      confetti.draw();
+
+      if (confetti.y > canvas.height) {
+        confettis.splice(index, 1);
+      }
+    });
+
+    if (confettis.length < 150) {
+      confettis.push(new Confetti(Math.random() * canvas.width, -20));
+    }
+
+    requestAnimationFrame(updateConfettis);
+  }
+
+  const catImages = ['Cat1.png', 'Cat2.png', 'Cat3.png', 'Cat4.png'];
+  const randomCatImage = catImages[Math.floor(Math.random() * catImages.length)];
+  document.getElementById('randomCatImage').src = '/img/' + randomCatImage;
+
+  updateConfettis();
+</script>
+</body>
+</html>
